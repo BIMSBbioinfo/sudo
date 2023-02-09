@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS reminders (
                     (format #false "| ~a | ~a | ~a | ~a | ~a | ~a | ~a |"
                             id by whom
                             (readable-date-from-seconds time)
-                            recur
+                            (or recur "no")
                             what
                             (readable-date-from-seconds created))) )
                  results)
