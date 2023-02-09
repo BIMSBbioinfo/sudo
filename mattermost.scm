@@ -263,8 +263,8 @@ CREATE TABLE IF NOT EXISTS reminders (
 onto that week day."
   (let* ((today (current-date (%tz)))
          (num-days-away
-          (match (mod (- (weekday->index day)
-                         (date-week-day today)) 7)
+          (match (modulo (- (weekday->index day)
+                            (date-week-day today)) 7)
             (0 7)
             (n n)))
          (num-seconds-away
