@@ -275,7 +275,8 @@ onto that week day."
     (date+time today time-until-reminder)))
 
 (define (string->time time)
-  "Return a time object from the string TIME, which may be a number"
+  "Return a time object from the string TIME, which may be a number or
+a colon-separated pair of hours and minutes."
   (match (string-split time #\:)
     ((hh)
      (make-time time-duration 0
