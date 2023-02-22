@@ -222,7 +222,8 @@ CREATE TABLE IF NOT EXISTS reminders (
 (define-peg-pattern delay all
   (+ (range #\0 #\9)))
 (define-peg-pattern when all
-  (or (and "at" (+ WS) time)
+  (or (and "now")
+      (and "at" (+ WS) time)
       (and "in" (+ WS) delay (+ WS) unit)
       (and "every day at" (+ WS) time)
       (and (? (and "every" (+ WS)))
@@ -305,6 +306,12 @@ a colon-separated pair of hours and minutes."
                ('when . when)
                ('what what))
      (match when
+       (("now")
+        (remind #:by user
+                #:whom whom
+                #:when (current-date (%tz))
+                #:recur? #false
+                #:message what))
        (("in" ('delay n) ('unit unit))
         (remind #:by user
                 #:whom whom
@@ -404,6 +411,7 @@ a colon-separated pair of hours and minutes."
 
 ### Example time formats
 
+- now
 - every Sunday at 13
 - every mon
 - Wednesday at 19:30
