@@ -188,7 +188,9 @@ CREATE TABLE IF NOT EXISTS reminders (
                  (lambda ()
                    (post-message #:channel channel
                                  #:text what))
-                 (lambda _
+                 (lambda exception
+                   (display exception)
+                   (display (newline))
                    (format (current-error-port)
                            "failed to post message to channel `~a': ~a"
                            channel what))))))
