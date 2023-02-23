@@ -512,9 +512,9 @@ a colon-separated pair of hours and minutes."
 (define (main . args)
   (init-db!)
   (match (cdr (program-arguments))
-    ((port hook-id . tokens)
+    ((url port hook-id . tokens)
      (set! %tokens tokens)
-     (set! %hook (string-append "https://mattermost.mdc-berlin.de/hooks/" hook-id))
+     (set! %hook (format #false "~a/hooks/~a" url hook-id))
      (call-with-new-thread
       (lambda ()
         (let loop ()
