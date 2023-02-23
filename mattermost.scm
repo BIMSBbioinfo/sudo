@@ -414,6 +414,46 @@ a colon-separated pair of hours and minutes."
 ---
 ")
 
+(define (subcommand-make text)
+  (match (string-tokenize text)
+    (("make" "me" . something)
+      (render-json
+        `(("text"
+          . ,(string-append "Why don't you make "
+            (string-join something " ")
+            " yourself?")))))
+    (("make" "love")
+      (render-json
+        `(("text" . "make love, not war."))))))
+
+(define (subcommand-remind text user)
+  (match (string-tokenize text)
+    (("remind" "help")
+      (render-json
+        `(("text" . ,help-text))))
+    (("remind" "list")
+      (render-json
+        `(("text" . ,(list-reminders)))))
+    (("remind" "list" "mine")
+      (render-json
+        `(("text" . ,(list-reminders user)))))
+    (("remind" "delete" id)
+      (catch #t
+        (lambda ()
+          (delete-reminder id)
+          (render-json
+            `(("text" . ,(list-reminders user)))))
+        (lambda _
+          (render-json
+            `(("text" . ,(format #false "failed to delete reminder ~a" id)))))))
+    (("remind" . command)
+      (let ((reminder (text->reminder text user)))
+        (if reminder
+          (render-json
+            `(("text" . ,reminder)))
+          (render-json
+            `(("text" . ,(format #false "I couldn't understand this: `~a`" text)))))))))
+
 (define (controller request body)
   (catch 'bad-token
     (lambda ()
@@ -429,42 +469,11 @@ a colon-separated pair of hours and minutes."
                 (text (assoc-ref data "text"))
                 (user (assoc-ref data "user_name")))
            (match (string-tokenize text)
-             (("make" "me" . something)
-              (render-json
-               `(("text"
-                  . ,(string-append "Why don't you make "
-                                    (string-join something " ")
-                                    " yourself?")))))
-             (("make" "love")
-              (render-json
-               `(("text" . "make love, not war."))))
-             (("remind" "help")
-              (render-json
-               `(("text" . ,help-text))))
-             (("remind" "list")
-              (render-json
-               `(("text" . ,(list-reminders)))))
-             (("remind" "list" "mine")
-              (render-json
-               `(("text" . ,(list-reminders user)))))
-             (("remind" "delete" id)
-              (catch #t
-                (lambda ()
-                  (delete-reminder id)
-                  (render-json
-                   `(("text" . ,(list-reminders user)))))
-                (lambda _
-                  (render-json
-                   `(("text" . ,(format #false "failed to delete reminder ~a" id))))))
-              )
-             (("remind" . command)
-              (let ((reminder (text->reminder text user)))
-                (if reminder
-                    (render-json
-                     `(("text" . ,reminder)))
-                    (render-json
-                     `(("text" . ,(format #false "I couldn't understand this: `~a`" text)))))))
-             (_
+            (("make" . _)
+                (subcommand-make text))
+            (("remind" . _)
+              (subcommand-remind text user))
+            (_
               (render-json
                `(("text" . ,(string-append "Pong: " text))))))))
         (_ (no-content))))
