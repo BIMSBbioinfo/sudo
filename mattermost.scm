@@ -235,8 +235,7 @@ CREATE TABLE IF NOT EXISTS reminders (
 (define-peg-pattern what all
   (+ peg-any))
 (define-peg-pattern command all
-  (and "remind" (+ WS)
-       whom (+ WS) when sep
+  (and whom (+ WS) when sep
        what))
 
 
@@ -302,8 +301,7 @@ a colon-separated pair of hours and minutes."
 
 (define (text->reminder text user)
   (match (peg:tree (match-pattern command text))
-    (('command "remind"
-               ('whom whom)
+    (('command ('whom whom)
                ('when . when)
                ('what what))
      (match when
@@ -429,18 +427,18 @@ a colon-separated pair of hours and minutes."
       (render-json
         `(("text" . ,(format #false "I have no idea how to make ~a." unexpected-thing)))))))
 
-(define (subcommand-remind text user)
-  (match (string-tokenize text)
-    (("remind" "help")
+(define (subcommand-remind command-tokens user)
+  (match command-tokens
+    (("help")
       (render-json
         `(("text" . ,help-text))))
-    (("remind" "list")
+    (("list")
       (render-json
         `(("text" . ,(list-reminders)))))
-    (("remind" "list" "mine")
+    (("list" "mine")
       (render-json
         `(("text" . ,(list-reminders user)))))
-    (("remind" "delete" id)
+    (("delete" id)
       (catch #t
         (lambda ()
           (delete-reminder id)
@@ -449,13 +447,14 @@ a colon-separated pair of hours and minutes."
         (lambda _
           (render-json
             `(("text" . ,(format #false "failed to delete reminder ~a" id)))))))
-    (("remind" . command)
-      (let ((reminder (text->reminder text user)))
+    (_
+      (let* ((text (string-join command-tokens " "))
+              (reminder (text->reminder text user)))
         (if reminder
           (render-json
             `(("text" . ,reminder)))
           (render-json
-            `(("text" . ,(format #false "I couldn't understand this: `~a`" text)))))))))
+            `(("text" . ,(format #false "I couldn't understand the reminder: `~a`" text)))))))))
 
 (define (controller request body)
   (catch 'bad-token
@@ -474,8 +473,8 @@ a colon-separated pair of hours and minutes."
            (match (string-tokenize text)
             (("make" . make-tokens)
               (subcommand-make make-tokens))
-            (("remind" . _)
-              (subcommand-remind text user))
+            (("remind" . remind-tokens)
+              (subcommand-remind remind-tokens user))
             (_
               (render-json
                `(("text" . ,(string-append "Pong: " text))))))))
