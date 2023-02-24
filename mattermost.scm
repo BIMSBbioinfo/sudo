@@ -102,6 +102,12 @@ CREATE TABLE IF NOT EXISTS reminders (
   recur INTEGER,
   what TEXT NOT NULL,
   created INTEGER NOT NULL
+)")
+  (sqlite-exec %db
+               "\
+CREATE TABLE IF NOT EXISTS candidates (
+  handle TEXT PRIMARY KEY,
+  last_participation INTEGER NOT NULL
 )"))
 
 
