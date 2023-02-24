@@ -414,18 +414,18 @@ a colon-separated pair of hours and minutes."
 ---
 ")
 
-(define (subcommand-make text)
-  (match (string-tokenize text)
-    (("make" "me" . something)
+(define (subcommand-make command-tokens)
+  (match command-tokens
+    (("me" . something)
       (render-json
         `(("text"
           . ,(string-append "Why don't you make "
             (string-join something " ")
             " yourself?")))))
-    (("make" "love")
+    (("love")
       (render-json
         `(("text" . "make love, not war."))))
-    (("make" unexpected-thing)
+    ((unexpected-thing)
       (render-json
         `(("text" . ,(format #false "I have no idea how to make ~a." unexpected-thing)))))))
 
@@ -472,8 +472,8 @@ a colon-separated pair of hours and minutes."
                 (text (assoc-ref data "text"))
                 (user (assoc-ref data "user_name")))
            (match (string-tokenize text)
-            (("make" . _)
-                (subcommand-make text))
+            (("make" . make-tokens)
+              (subcommand-make make-tokens))
             (("remind" . _)
               (subcommand-remind text user))
             (_
