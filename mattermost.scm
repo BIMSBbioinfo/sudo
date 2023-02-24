@@ -424,7 +424,10 @@ a colon-separated pair of hours and minutes."
             " yourself?")))))
     (("make" "love")
       (render-json
-        `(("text" . "make love, not war."))))))
+        `(("text" . "make love, not war."))))
+    (("make" unexpected-thing)
+      (render-json
+        `(("text" . ,(format #false "I have no idea how to make ~a." unexpected-thing)))))))
 
 (define (subcommand-remind text user)
   (match (string-tokenize text)
