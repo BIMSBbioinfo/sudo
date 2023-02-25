@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS reminders (
                             id by whom
                             (readable-date-from-seconds time)
                             (or recur "no")
-                            what
+                            (string-delete (char-set #\newline) what)
                             (readable-date-from-seconds created))) )
                  results)
           (list "---"))
