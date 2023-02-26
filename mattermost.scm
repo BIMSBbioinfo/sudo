@@ -663,6 +663,8 @@ a colon-separated pair of hours and minutes."
               (subcommand-make make-tokens))
             (("remind" . remind-tokens)
               (subcommand-remind remind-tokens user))
+            (("update" . update-tokens)
+              (subcommand-update update-tokens))
             (_
               (render-json
                `(("text" . ,(string-append "Pong: " text))))))))
