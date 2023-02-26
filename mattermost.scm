@@ -70,13 +70,21 @@ output port, and PROC's result is returned."
 
 
 (define* (post-message #:key channel text)
-  (http-post %hook
-             #:headers '((content-type . (application/json)))
-             #:body
-             (scm->json-string
-              `(("channel" . ,channel)
-                ("text" .
-                 ,text)))))
+  (catch #t
+   (lambda ()
+    (http-post %hook
+     #:headers '((content-type . (application/json)))
+     #:body
+     (scm->json-string
+      `(("channel" . ,channel)
+        ("text" .
+         ,text)))))
+   (lambda exception
+     (display exception)
+     (display (newline))
+     (format (current-error-port)
+             "failed to post message to channel `~a': ~a"
+             channel text))))
 
 
 (define* (sqlite-exec* db sql . args)
@@ -190,16 +198,8 @@ CREATE TABLE IF NOT EXISTS candidates (
                              ((string-prefix? "~" whom)
                               (string-drop whom 1))
                              (else whom))))
-               (catch #t
-                 (lambda ()
-                   (post-message #:channel channel
-                                 #:text (string-append "Reminder: " what)))
-                 (lambda exception
-                   (display exception)
-                   (display (newline))
-                   (format (current-error-port)
-                           "failed to post message to channel `~a': ~a"
-                           channel what))))))
+               (post-message #:channel channel
+                             #:text (string-append "Reminder: " what)))))
           some))))
 
 
