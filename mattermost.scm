@@ -390,6 +390,37 @@ a colon-separated pair of hours and minutes."
         (format #false "unhandled parse tree: ~y" parse))))
     (_ #false)))
 
+(define (remind-help)
+  (string-join
+   '("---"
+     "| Command                              | Description          |"
+     "|:-------------------------------------|:---------------------|"
+     "| /sudo remind help                    | Show help            |"
+     "| /sudo remind list                    | List all reminders   |"
+     "| /sudo remind list mine               | List my reminders    |"
+     "| /sudo remind delete [id]             | Delete reminder [id] |"
+     "| /sudo remind [whom] [when]: [what]   | Do the thing.        |"
+     "| /sudo remind [whom] [when] to [what] | Do the thing.        |"
+     ""
+     "### Example targets"
+     ""
+     "| Command        | Description                        |"
+     "|:---------------|:-----------------------------------|"
+     "| me             | Remind me, duh                     |"
+     "| ~general       | Send reminder to channel `general` |"
+     "| @vonnegut      | Send reminder to user `vonnegut`   |"
+     ""
+     "### Example time formats"
+     ""
+     "- now"
+     "- every Sunday at 13"
+     "- every mon"
+     "- Wednesday at 19:30"
+     "- at 23:12"
+     "- in 3 hours"
+     "---")
+  "\n"))
+
 (define (all-help)
   (string-join
    '("---"
@@ -457,7 +488,7 @@ a colon-separated pair of hours and minutes."
   (match command-tokens
     (("help")
       (render-json
-        `(("text" . ,help-text))))
+        `(("text" . ,(remind-help)))))
     (("list")
       (render-json
         `(("text" . ,(list-reminders)))))
