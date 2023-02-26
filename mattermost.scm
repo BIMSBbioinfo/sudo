@@ -478,6 +478,25 @@ a colon-separated pair of hours and minutes."
       (format #false "~a doesn't exist" handle)))
    handles))
 
+(define (list-handles)
+  (let ((handles (sqlite-exec* %db "SELECT * FROM candidates ORDER BY last_participation ASC")))
+    (match handles
+      (() "There are no candidates in the database.")
+      (results
+       (string-join
+        (append
+            (list "---"
+                  "| Handle | Last update |"
+                  "|:-------|:------------|")
+            (map (match-lambda
+                   (#(handle last-update)
+                    (format #false "| ~a | ~a |"
+                            handle
+                            (readable-date-from-seconds last-update))))
+                 results)
+          (list "---"))
+        "\n")))))
+
 (define (all-help)
   (string-join
    '("---"
