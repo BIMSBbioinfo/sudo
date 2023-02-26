@@ -436,6 +436,14 @@ a colon-separated pair of hours and minutes."
      "---")
   "\n"))
 
+(define (handle-exists? handle)
+  (match (sqlite-exec*
+          %db
+          "SELECT * FROM candidates WHERE handle = :handle"
+          #:handle handle)
+    (() #false)
+    (some #true)))
+
 (define (all-help)
   (string-join
    '("---"
