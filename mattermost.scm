@@ -390,6 +390,15 @@ a colon-separated pair of hours and minutes."
         (format #false "unhandled parse tree: ~y" parse))))
     (_ #false)))
 
+(define (make-help)
+ (string-join
+  '("---"
+    "| Command                              | Description                    |"
+    "|:-------------------------------------|:-------------------------------|"
+    "| /sudo make me a sandwich             | Okay.                          |"
+    "---")
+  "\n"))
+
 (define (remind-help)
   (string-join
    '("---"
@@ -471,6 +480,9 @@ a colon-separated pair of hours and minutes."
 
 (define (subcommand-make command-tokens)
   (match command-tokens
+    (("help")
+      (render-json
+        `(("text" . ,(make-help)))))
     (("me" . something)
       (render-json
         `(("text"
