@@ -76,7 +76,7 @@ output port, and PROC's result is returned."
              (scm->json-string
               `(("channel" . ,channel)
                 ("text" .
-                 ,(string-append "Reminder: " text))))))
+                 ,text)))))
 
 
 (define* (sqlite-exec* db sql . args)
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS candidates (
                (catch #t
                  (lambda ()
                    (post-message #:channel channel
-                                 #:text what))
+                                 #:text (string-append "Reminder: " what)))
                  (lambda exception
                    (display exception)
                    (display (newline))
