@@ -497,6 +497,27 @@ a colon-separated pair of hours and minutes."
           (list "---"))
         "\n")))))
 
+(define (choose-candidates n)
+  ;; TODO Make this random weighted by time.
+  (let ((results (sqlite-exec*
+                  %db
+                  "SELECT * FROM candidates ORDER BY last_participation ASC LIMIT :n"
+                  #:n n)))
+    (match results
+      (() "There seem to be no candidates to choose from.")
+      (some
+       (string-join
+        (map (lambda (entry)
+               (let ((handle (vector-ref entry 0))
+                    (last-update (vector-ref entry 1)))
+                 (format
+                  #false
+                  "~a (last update on ~a)" 
+                  handle
+                  (readable-date-from-seconds last-update))))
+         results)
+        "\n")))))
+
 (define (all-help)
   (string-join
    '("---"
