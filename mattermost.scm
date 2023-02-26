@@ -443,6 +443,24 @@ a colon-separated pair of hours and minutes."
           #:handle handle)
     (() #false)
     (some #true)))
+  
+(define (add-handles handles)
+  (map
+   (lambda (handle)
+    (let ((last-update (time-second (current-time time-utc))))
+      (if (handle-exists? handle)
+        (format #false "~a was already present" handle)
+        (begin
+          (sqlite-exec*
+               %db
+               (string-join 
+                '("INSERT INTO candidates"
+                  "(handle, last_participation) VALUES"
+                  "(:handle, :last_update)")
+                 " ")
+               #:handle handle #:last_update last-update)
+          (format #false "~a was newly added" handle)))))
+    handles))
 
 (define (all-help)
   (string-join
