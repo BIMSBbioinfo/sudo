@@ -644,7 +644,7 @@ a colon-separated pair of hours and minutes."
             (complaint (if (> (length n-list) 1)
                            (format
                             #false
-                            "\nIgnoring additional information ~a"
+                            "\n(Ignoring additional information ~a)"
                             (cdr n-list))
                            "")))
         ;; TODO Change this to do a public post.
