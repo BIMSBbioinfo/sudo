@@ -646,10 +646,26 @@ a colon-separated pair of hours and minutes."
                             #false
                             "\n(Ignoring additional information ~a)"
                             (cdr n-list))
-                           "")))
-        ;; TODO Change this to do a public post.
-        (render-json
-            `(("text" . ,(string-append choose-string complaint))))))
+                           ""))
+          (channel "town-square")) ; Every server has this channel.
+        (begin
+         (post-message
+          #:channel channel
+          #:text (string-append
+                  choose-string 
+                  (string-append
+                   (string-join
+                    '("\nIf you are currently in a meeting,"
+                      "please tell the others what you have been up to.")
+                    " ")
+                   complaint)))
+         (render-json
+            `(("text" .
+               ,(format
+                 #false
+                 "Chose candidates, check  ~town-square\n~a"
+                 (string-append choose-string complaint))
+                 ))))))
     (("confirm" . handles)
       (render-json
         `(("text" . ,(confirm-candidates handles)))))
