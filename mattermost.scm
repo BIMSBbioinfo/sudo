@@ -390,6 +390,22 @@ a colon-separated pair of hours and minutes."
         (format #false "unhandled parse tree: ~y" parse))))
     (_ #false)))
 
+(define (all-help)
+  (string-join
+   '("---"
+     "# Sudo - All purpose mattermost bot"
+     ""
+     "Invoke via `/sudo subcommand args`"
+     "See subcommand help via `/sudo subcommand help`"
+     ""
+     "## Subcommands"
+     ""
+     "* `remind` Set and manage reminders."
+     "* `update` Update round help."
+     "* `make` Experience the power of `sudo`."
+     "---")
+   "\n"))
+
 (define help-text
   "\
 ---
@@ -481,6 +497,8 @@ a colon-separated pair of hours and minutes."
                 (text (assoc-ref data "text"))
                 (user (assoc-ref data "user_name")))
            (match (string-tokenize text)
+            (("help")
+              (render-json `(("text" . ,(all-help)))))
             (("make" . make-tokens)
               (subcommand-make make-tokens))
             (("remind" . remind-tokens)
