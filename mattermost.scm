@@ -518,6 +518,29 @@ a colon-separated pair of hours and minutes."
          results)
         "\n")))))
 
+(define (confirm-candidates handles)
+  (map
+   (lambda (handle)
+     (if (handle-exists? handle)
+       (begin
+        (sqlite-exec*
+         %db
+         (string-join '("UPDATE candidates"
+                        "SET last_participation = :last_update"
+                        "WHERE handle = :handle")
+                      " ")
+         #:last_update (time-second (current-time time-utc))
+         #:handle handle)
+        (format
+         #false
+         "updated last presentation time of ~a"
+         handle))
+       (format
+        #false
+        "couldn't find an entry for ~a"
+        handle)))
+   handles))
+
 (define (all-help)
   (string-join
    '("---"
