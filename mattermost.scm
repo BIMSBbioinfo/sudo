@@ -604,6 +604,44 @@ a colon-separated pair of hours and minutes."
           (render-json
             `(("text" . ,(format #false "I couldn't understand the reminder: `~a`" text)))))))))
 
+(define (subcommand-update command-tokens) 
+  (match command-tokens
+    (("add" . handles)
+      (render-json
+        `(("text" . ,(string-join (add-handles handles)
+                                   ", ")))))
+    (("list")
+      (render-json
+        `(("text" . ,(list-handles)))))  
+    (("remove" . handles)
+      (render-json
+        `(("text" . ,(string-join (remove-handles handles)
+                                   ", ")))))
+    (("choose" . n-list)
+      (let ((choose-string (if (null? n-list)
+                                (choose-candidates "1")
+                                (choose-candidates (car n-list))))
+            (complaint (if (> (length n-list) 1)
+                           (format
+                            #false
+                            "\nIgnoring additional information ~a"
+                            (cdr n-list))
+                           "")))
+        ;; TODO Change this to do a public post.
+        (render-json
+            `(("text" . ,(string-append choose-string complaint))))))
+    (("confirm" . handles)
+      (render-json
+        `(("text" . ,(string-join (confirm-candidates handles)
+                                   "\n")))))
+    ((unexpected-thing)
+      (render-json
+        `(("text" .
+           ,(format
+             #false
+             "I don't understand this update subcommand: `~a`"
+             unexpected-thing)))))))
+
 (define (controller request body)
   (catch 'bad-token
     (lambda ()
