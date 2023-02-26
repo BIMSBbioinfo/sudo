@@ -511,6 +511,22 @@ a colon-separated pair of hours and minutes."
           loop-idx
           (loop (+ loop-idx 1) (+ weights-accum (list-ref weights (+ loop-idx 1))))))))
 
+(define (weighted-sample x weights n)
+  ;; No provisions are made for duplicates in x.
+  (define (weighted-sample x n n-max choices)
+    (if (>= n n-max)
+       choices
+       (let* ((choice-idx (weighted-random (map cdr x)))
+              (choice-pair (list-ref x choice-idx)))
+         (weighted-sample
+          (assoc-remove! x (car choice-pair))
+          (+ n 1)
+          n-max
+          (append choices (list (car choice-pair)))))))
+  (let ((x (map cons x weights))
+        (choices '()))
+    (weighted-sample x 0 n choices)))
+
 (define (choose-candidates n)
   ;; TODO Make this random weighted by time.
   (let ((results (sqlite-exec*
