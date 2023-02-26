@@ -445,38 +445,42 @@ a colon-separated pair of hours and minutes."
     (some #true)))
   
 (define (add-handles handles)
-  (map
-   (lambda (handle)
-    (let ((last-update (time-second (current-time time-utc))))
-      (if (handle-exists? handle)
-        (format #false "~a was already present" handle)
-        (begin
-          (sqlite-exec*
-               %db
-               (string-join 
-                '("INSERT INTO candidates"
-                  "(handle, last_participation) VALUES"
-                  "(:handle, :last_update)")
-                 " ")
-               #:handle handle #:last_update last-update)
-          (format #false "~a was newly added" handle)))))
-    handles))
+  (string-join
+   (map
+    (lambda (handle)
+     (let ((last-update (time-second (current-time time-utc))))
+       (if (handle-exists? handle)
+         (format #false "~a was already present" handle)
+         (begin
+           (sqlite-exec*
+                %db
+                (string-join 
+                 '("INSERT INTO candidates"
+                   "(handle, last_participation) VALUES"
+                   "(:handle, :last_update)")
+                  " ")
+                #:handle handle #:last_update last-update)
+           (format #false "~a was newly added" handle)))))
+     handles)
+  "\n"))
 
 (define (remove-handles handles)
-  (map
-   (lambda (handle)
-    (if (handle-exists? handle)
-      (begin
-       (sqlite-exec*
-        %db
-        (string-join 
-        '("DELETE FROM candidates"
-          "WHERE handle = :handle")
-         " ")
-        #:handle handle)
-       (format #false "~a was deleted" handle))
-      (format #false "~a doesn't exist" handle)))
-   handles))
+  (string-join
+   (map
+    (lambda (handle)
+     (if (handle-exists? handle)
+       (begin
+        (sqlite-exec*
+         %db
+         (string-join 
+         '("DELETE FROM candidates"
+           "WHERE handle = :handle")
+          " ")
+         #:handle handle)
+        (format #false "~a was deleted" handle))
+       (format #false "~a doesn't exist" handle)))
+    handles)
+   "\n"))
 
 (define (list-handles)
   (let ((handles (sqlite-exec* %db "SELECT * FROM candidates ORDER BY last_participation ASC")))
@@ -519,27 +523,29 @@ a colon-separated pair of hours and minutes."
         "\n")))))
 
 (define (confirm-candidates handles)
-  (map
-   (lambda (handle)
-     (if (handle-exists? handle)
-       (begin
-        (sqlite-exec*
-         %db
-         (string-join '("UPDATE candidates"
-                        "SET last_participation = :last_update"
-                        "WHERE handle = :handle")
-                      " ")
-         #:last_update (time-second (current-time time-utc))
-         #:handle handle)
+  (string-join
+   (map
+    (lambda (handle)
+      (if (handle-exists? handle)
+        (begin
+         (sqlite-exec*
+          %db
+          (string-join '("UPDATE candidates"
+                         "SET last_participation = :last_update"
+                         "WHERE handle = :handle")
+                       " ")
+          #:last_update (time-second (current-time time-utc))
+          #:handle handle)
+         (format
+          #false
+          "updated last presentation time of ~a"
+          handle))
         (format
          #false
-         "updated last presentation time of ~a"
-         handle))
-       (format
-        #false
-        "couldn't find an entry for ~a"
-        handle)))
-   handles))
+         "couldn't find an entry for ~a"
+         handle)))
+    handles)
+   "\n"))
 
 (define (all-help)
   (string-join
@@ -624,15 +630,13 @@ a colon-separated pair of hours and minutes."
         `(("text" . ,(update-help)))))
     (("add" . handles)
       (render-json
-        `(("text" . ,(string-join (add-handles handles)
-                                   ", ")))))
+        `(("text" . ,(add-handles handles)))))
     (("list")
       (render-json
         `(("text" . ,(list-handles)))))  
     (("remove" . handles)
       (render-json
-        `(("text" . ,(string-join (remove-handles handles)
-                                   ", ")))))
+        `(("text" . ,(remove-handles handles)))))
     (("choose" . n-list)
       (let ((choose-string (if (null? n-list)
                                 (choose-candidates "1")
@@ -648,8 +652,7 @@ a colon-separated pair of hours and minutes."
             `(("text" . ,(string-append choose-string complaint))))))
     (("confirm" . handles)
       (render-json
-        `(("text" . ,(string-join (confirm-candidates handles)
-                                   "\n")))))
+        `(("text" . ,(confirm-candidates handles)))))
     ((unexpected-thing)
       (render-json
         `(("text" .
