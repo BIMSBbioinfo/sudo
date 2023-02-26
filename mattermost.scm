@@ -557,6 +557,19 @@ a colon-separated pair of hours and minutes."
      "---")
    "\n"))
 
+(define (update-help)
+ (string-join
+  '("---"
+    "| Command                              | Description                    |"
+    "|:-------------------------------------|:-------------------------------|"
+    "| /sudo update add [handles]           | Add presentation candidates.   |"
+    "| /sudo update remove [handles]        | Remove candidates.             |"
+    "| /sudo update list                    | List all candidates.           |"
+    "| /sudo update choose [n]              | Choose a number of candidates. |"
+    "| /sudo update confirm [handles]       | Update presentation date.      |"
+    "---")
+  "\n"))
+
 (define (subcommand-make command-tokens)
   (match command-tokens
     (("help")
@@ -606,6 +619,9 @@ a colon-separated pair of hours and minutes."
 
 (define (subcommand-update command-tokens) 
   (match command-tokens
+    (("help")
+      (render-json
+        `(("text" . ,(update-help)))))
     (("add" . handles)
       (render-json
         `(("text" . ,(string-join (add-handles handles)
