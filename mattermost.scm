@@ -462,6 +462,22 @@ a colon-separated pair of hours and minutes."
           (format #false "~a was newly added" handle)))))
     handles))
 
+(define (remove-handles handles)
+  (map
+   (lambda (handle)
+    (if (handle-exists? handle)
+      (begin
+       (sqlite-exec*
+        %db
+        (string-join 
+        '("DELETE FROM candidates"
+          "WHERE handle = :handle")
+         " ")
+        #:handle handle)
+       (format #false "~a was deleted" handle))
+      (format #false "~a doesn't exist" handle)))
+   handles))
+
 (define (all-help)
   (string-join
    '("---"
