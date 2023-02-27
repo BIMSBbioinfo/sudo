@@ -528,25 +528,29 @@ a colon-separated pair of hours and minutes."
     (weighted-sample x 0 n choices)))
 
 (define (choose-candidates n)
-  ;; TODO Make this random weighted by time.
   (let ((results (sqlite-exec*
                   %db
-                  "SELECT * FROM candidates ORDER BY last_participation ASC LIMIT :n"
-                  #:n n)))
+                  "SELECT * FROM candidates ORDER BY last_participation")))
     (match results
       (() "There seem to be no candidates to choose from.")
       (some
-       (string-join
-        (map (lambda (entry)
-               (let ((handle (vector-ref entry 0))
-                    (last-update (vector-ref entry 1)))
-                 (format
-                  #false
-                  "~a (last update on ~a)" 
-                  handle
-                  (readable-date-from-seconds last-update))))
-         results)
-        "\n")))))
+       (let ((weights (map
+                       (lambda (date)
+                         (- (time-second (current-time time-utc)) date))
+                        (map
+                         (lambda (vector) (vector-ref vector 1))
+                         results))))
+        (string-join
+         (map (lambda (entry)
+                (let ((handle (vector-ref entry 0))
+                     (last-update (vector-ref entry 1)))
+                  (format
+                   #false
+                   "~a (last update on ~a)" 
+                   handle
+                   (readable-date-from-seconds last-update))))
+          (weighted-sample results weights (string->number n)))
+         "\n"))))))
 
 (define (confirm-candidates handles)
   (string-join
