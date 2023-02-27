@@ -12,6 +12,7 @@
              (web uri)
              (ice-9 match)
              (ice-9 peg)
+             (ice-9 regex)
              (ice-9 threads)
              (srfi srfi-1)
              (srfi srfi-19)
@@ -675,34 +676,44 @@ a colon-separated pair of hours and minutes."
       (render-json
         `(("text" . ,(remove-handles handles)))))
     (("choose" . n-list)
-      (let ((choose-string (if (null? n-list)
-                                (choose-candidates "1")
-                                (choose-candidates (car n-list))))
-            (complaint (if (> (length n-list) 1)
-                           (format
-                            #false
-                            "\n(Ignoring additional information ~a)"
-                            (cdr n-list))
-                           ""))
-          (channel "town-square")) ; Every server has this channel.
-        (begin
-         (post-message
-          #:channel channel
-          #:text (string-append
-                  choose-string 
-                  (string-append
-                   (string-join
-                    '("\nIf you are currently in a meeting,"
-                      "please tell the others what you have been up to.")
-                    " ")
-                   complaint)))
-         (render-json
+      (let ((n (if (null? n-list)
+                   "1"
+                   (if (string-match "[0-9]+" (car n-list))
+                       (car n-list)
+                       #f))))
+        (if n
+          (let ((choose-string (choose-candidates n))
+                (complaint (if (> (length n-list) 1)
+                               (format
+                                #false
+                                "\n(Ignoring additional information ~a)"
+                                (cdr n-list))
+                               ""))
+                (channel "town-square")) ; Every server has this channel.
+            (begin
+             (post-message
+              #:channel channel
+              #:text (string-append
+                      choose-string 
+                      (string-append
+                       (string-join
+                        '("\nIf you are currently in a meeting,"
+                          "please tell the others what you have been up to.")
+                        " ")
+                       complaint)))
+             (render-json
+              `(("text" .
+                 ,(format
+                   #false
+                   "Chose candidates, check  ~town-square\n~a"
+                   (string-append choose-string complaint))
+                   )))))
+          (render-json
             `(("text" .
                ,(format
                  #false
-                 "Chose candidates, check  ~town-square\n~a"
-                 (string-append choose-string complaint))
-                 ))))))
+                 "Could not parse number of handles to choose: ~a"
+                 (car n-list))))))))
     (("confirm" . handles)
       (render-json
         `(("text" . ,(confirm-candidates handles)))))
