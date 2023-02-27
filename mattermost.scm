@@ -597,6 +597,12 @@ a colon-separated pair of hours and minutes."
 (define (update-help)
  (string-join
   '("---"
+    "### General workflow:"
+    ""
+    "* Add handles whose people regularly participate in the lab meeting (`add`)"
+    "* Let the bot choose any number of them at random, weighted by how long it has been since their last presentation (`choose`)"
+    "* If one of them actually presents, confirm this to update their last update date to the current time (`confirm`)"
+    ""
     "| Command                              | Description                    |"
     "|:-------------------------------------|:-------------------------------|"
     "| /sudo update add [handles]           | Add presentation candidates.   |"
