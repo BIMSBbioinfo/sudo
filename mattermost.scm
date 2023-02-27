@@ -546,9 +546,10 @@ a colon-separated pair of hours and minutes."
                      (last-update (vector-ref entry 1)))
                   (format
                    #false
-                   "~a (last update on ~a)" 
+                   "~a (last update on ~a, confirm with `/sudo update confirm ~a`)" 
                    handle
-                   (readable-date-from-seconds last-update))))
+                   (readable-date-from-seconds last-update)
+                   handle)))
           (weighted-sample results weights (string->number n)))
          "\n"))))))
 
