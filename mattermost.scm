@@ -446,7 +446,7 @@ a colon-separated pair of hours and minutes."
           "SELECT * FROM candidates WHERE handle = :handle LIMIT 1"
           #:handle handle)
     (() #false)
-    (some #true)))
+    (entry entry)))
   
 (define (add-handles handles)
   (string-join
