@@ -544,15 +544,15 @@ a colon-separated pair of hours and minutes."
                           (- (time-second (current-time time-utc)) last-update)))
                        results)))
         (string-join
-         (map (lambda (entry)
-                (let ((handle (vector-ref entry 0))
-                     (last-update (vector-ref entry 1)))
-                  (format
-                   #false
-                   "~a (last update on ~a, confirm with `/sudo update confirm ~a`)" 
-                   handle
-                   (readable-date-from-seconds last-update)
-                   handle)))
+         (map
+          (match-lambda
+           (#(handle last-update)
+            (format
+             #false
+             "~a (last update on ~a, confirm with `/sudo update confirm ~a`)" 
+             handle
+             (readable-date-from-seconds last-update)
+             handle)))
           (weighted-sample results weights (string->number n)))
          "\n"))))))
 
