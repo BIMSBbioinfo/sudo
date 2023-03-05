@@ -553,7 +553,7 @@ a colon-separated pair of hours and minutes."
              handle
              (readable-date-from-seconds last-update)
              handle)))
-          (weighted-sample results weights (string->number n)))
+          (weighted-sample results weights n))
          "\n"))))))
 
 (define (confirm-candidates handles)
@@ -679,9 +679,9 @@ a colon-separated pair of hours and minutes."
         `(("text" . ,(remove-handles handles)))))
     (("choose" . n-list)
       (let ((n (if (null? n-list)
-                   "1"
+                   1
                    (if (string-match "[0-9]+" (car n-list))
-                       (car n-list)
+                       (string->number (car n-list))
                        #f))))
         (if n
           (let ((choose-string (choose-candidates n))
