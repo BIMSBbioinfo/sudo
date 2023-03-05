@@ -705,7 +705,7 @@ a colon-separated pair of hours and minutes."
               `(("text" .
                  ,(format
                    #false
-                   "Chose candidates, check  ~town-square\n~a"
+                   "Chose candidates, check ~~town-square\n~a"
                    (string-append choose-string complaint))
                    )))))
           (render-json
