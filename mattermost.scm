@@ -443,7 +443,7 @@ a colon-separated pair of hours and minutes."
 (define (handle-exists? handle)
   (match (sqlite-exec*
           %db
-          "SELECT * FROM candidates WHERE handle = :handle"
+          "SELECT * FROM candidates WHERE handle = :handle LIMIT 1"
           #:handle handle)
     (() #false)
     (some #true)))
