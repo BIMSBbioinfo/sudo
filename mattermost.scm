@@ -27,6 +27,9 @@
 (define %tokens (list))
 (define %hook #false)
 
+;; Needed for non-predictable choosing of candidates, even after restarts.
+(set! *random-state* (random-state-from-platform))
+
 
 (define (request-path-components request)
   (split-and-decode-uri-path (uri-path (request-uri request))))
