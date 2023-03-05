@@ -539,11 +539,10 @@ a colon-separated pair of hours and minutes."
       (() "There seem to be no candidates to choose from.")
       (some
        (let ((weights (map
-                       (lambda (date)
-                         (- (time-second (current-time time-utc)) date))
-                        (map
-                         (lambda (vector) (vector-ref vector 1))
-                         results))))
+                       (match-lambda
+                        (#(handle last-update)
+                          (- (time-second (current-time time-utc)) last-update)))
+                       results)))
         (string-join
          (map (lambda (entry)
                 (let ((handle (vector-ref entry 0))
