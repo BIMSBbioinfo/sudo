@@ -526,7 +526,7 @@ a colon-separated pair of hours and minutes."
           (assoc-remove! x (car choice-pair))
           (+ n 1)
           n-max
-          (append choices (list (car choice-pair)))))))
+          (cons (car choice-pair) choices)))))
   (let ((x (map cons x weights))
         (choices '()))
     (weighted-sample x 0 n choices)))
