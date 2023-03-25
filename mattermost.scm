@@ -505,7 +505,7 @@ a colon-separated pair of hours and minutes."
           (list "---"))
         "\n")))))
 
-(define (weighted-random weights)
+(define (weighted-random* weights)
   (if
    (every zero? weights)
    (random (length weights))
@@ -526,7 +526,7 @@ of the values themselves."
   (define (weighted-sample value-weight-pairs n n-max choices)
     (if (>= n n-max)
         choices
-        (let* ((choice-idx (weighted-random (map cdr value-weight-pairs)))
+        (let* ((choice-idx (weighted-random* (map cdr value-weight-pairs)))
                (choice-pair (list-ref value-weight-pairs choice-idx)))
           (weighted-sample
            (assoc-remove! value-weight-pairs (car choice-pair))
