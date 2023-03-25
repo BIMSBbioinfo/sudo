@@ -516,6 +516,11 @@ a colon-separated pair of hours and minutes."
           (loop (+ loop-idx 1) (+ weights-accum (list-ref weights (+ loop-idx 1))))))))
 
 (define (weighted-sample x weights n)
+  "For an arbitrary list x and a list of weights of the same length return
+n elements of x, the probability of which is the normalized weight at the
+same index.
+Avoids issues with duplicate entries by sampling from the indices instead
+of the values themselves."
   (define (weighted-sample value-weight-pairs n n-max choices)
     (if (>= n n-max)
         choices
