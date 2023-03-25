@@ -518,14 +518,14 @@ a colon-separated pair of hours and minutes."
 (define (weighted-sample x weights n)
   (define (weighted-sample value-weight-pairs n n-max choices)
     (if (>= n n-max)
-       choices
-       (let* ((choice-idx (weighted-random (map cdr value-weight-pairs)))
-              (choice-pair (list-ref value-weight-pairs choice-idx)))
-         (weighted-sample
-          (assoc-remove! value-weight-pairs (car choice-pair))
-          (+ n 1)
-          n-max
-          (cons (car choice-pair) choices)))))
+        choices
+        (let* ((choice-idx (weighted-random (map cdr value-weight-pairs)))
+               (choice-pair (list-ref value-weight-pairs choice-idx)))
+          (weighted-sample
+           (assoc-remove! value-weight-pairs (car choice-pair))
+           (+ n 1)
+           n-max
+           (cons (car choice-pair) choices)))))
   (let* ((index-weight-pairs (map cons (iota (length x)) weights))
          (choices '())
          (indices (weighted-sample index-weight-pairs 0 n choices)))
