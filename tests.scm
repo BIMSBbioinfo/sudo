@@ -49,5 +49,42 @@
   (+ (* 2 60 60) (* 50 60))
   (time-second (string->time "2:50")))
 
+;; The sampling procedures depend on the *random-state* variable
+;; and in order to maintain reproducibility, it needs to be reset
+;; before each time it is used.
+(define original-state *random-state*)
+(define seed 123)
+;; These explicitly do not require the random state to be set
+;; for predictable results as weight zero means a value is never
+;; picked.
+(test-equal "weighted-random*"
+  0
+  (weighted-random* '(1 0 0 0)))
+(test-equal "weighted-random*"
+  1
+  (weighted-random* '(0 1 0 0)))
+
+(test-equal "weighted-sample"
+   '()
+   (weighted-sample '(1 2 3) '(1 1 1) 0))
+
+
+(begin
+  (set! *random-state* (seed->random-state seed))
+  (test-equal "weighted-random*"
+   1
+   (weighted-random* '(0 0 0 0 0))))
+(begin
+  (set! *random-state* (seed->random-state seed))
+  (test-equal "weighted-random*"
+   0
+   (weighted-random* '(3 2 1))))
+
+(begin
+  (set! *random-state* (seed->random-state seed))
+  (test-equal "weighted-sample"
+   '(1 2)
+   (weighted-sample '(1 2 3) '(1 1 1) 2)))
+
 (test-end "mattermost")
 
