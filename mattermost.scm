@@ -517,19 +517,19 @@ a colon-separated pair of hours and minutes."
 
 (define (weighted-sample x weights n)
   ;; No provisions are made for duplicates in x.
-  (define (weighted-sample x n n-max choices)
+  (define (weighted-sample value-weight-pairs n n-max choices)
     (if (>= n n-max)
        choices
-       (let* ((choice-idx (weighted-random (map cdr x)))
-              (choice-pair (list-ref x choice-idx)))
+       (let* ((choice-idx (weighted-random (map cdr value-weight-pairs)))
+              (choice-pair (list-ref value-weight-pairs choice-idx)))
          (weighted-sample
-          (assoc-remove! x (car choice-pair))
+          (assoc-remove! value-weight-pairs (car choice-pair))
           (+ n 1)
           n-max
           (cons (car choice-pair) choices)))))
-  (let ((x (map cons x weights))
+  (let ((x-weight-pairs (map cons x weights))
         (choices '()))
-    (weighted-sample x 0 n choices)))
+    (weighted-sample x-weight-pairs 0 n choices)))
 
 (define (choose-candidates n)
   (let ((results (sqlite-exec*
