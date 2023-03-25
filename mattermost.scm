@@ -506,6 +506,12 @@ a colon-separated pair of hours and minutes."
         "\n")))))
 
 (define (weighted-random* weights)
+  "For a list of numeric weights, return a random index of one of the weights
+with the probability corresponding to the normalized weight.
+Note: A weight of zero is a probability of zero, so an index with this weight
+will never be picked. This function is special, as in the case of all weights
+being zero, it will pick an index uniformly at random instead of raising an
+error."
   (if
    (every zero? weights)
    (random (length weights))
