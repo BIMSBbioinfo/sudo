@@ -516,7 +516,6 @@ a colon-separated pair of hours and minutes."
           (loop (+ loop-idx 1) (+ weights-accum (list-ref weights (+ loop-idx 1))))))))
 
 (define (weighted-sample x weights n)
-  ;; No provisions are made for duplicates in x.
   (define (weighted-sample value-weight-pairs n n-max choices)
     (if (>= n n-max)
        choices
@@ -527,9 +526,10 @@ a colon-separated pair of hours and minutes."
           (+ n 1)
           n-max
           (cons (car choice-pair) choices)))))
-  (let ((x-weight-pairs (map cons x weights))
-        (choices '()))
-    (weighted-sample x-weight-pairs 0 n choices)))
+  (let* ((index-weight-pairs (map cons (iota (length x)) weights))
+         (choices '())
+         (indices (weighted-sample index-weight-pairs 0 n choices)))
+    (map (lambda (index) (list-ref x index)) indices)))
 
 (define (choose-candidates n)
   (let ((results (sqlite-exec*
